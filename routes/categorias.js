@@ -20,10 +20,23 @@ router.get('/', async (req, res, next) => {
 
 router.post('/', async (req, res, next) => {
     try{
+        // 1. Busca as categorias para calcular o próximo ID (evita erro de auto-incremento desativado no Supabase)
+        const { data: categorias, error: getError } = await supabase
+            .from('categorias')
+            .select('id');
+        if (getError) throw getError;
+
+        const novoId = categorias && categorias.length > 0 
+            ? Math.max(...categorias.map(c => c.id)) + 1 
+            : 1;
+
+        // 2. Aceita tanto 'nome' (teste manual) quanto 'name' (enviado pelo cozinha.html do front)
+        const nomeInserir = req.body.nome || req.body.name;
+
         const { data, error } = await supabase
-        .from('categorias')
-        .insert([{nome: req.body.nome}])
-        .select();
+            .from('categorias')
+            .insert([{ id: novoId, nome: nomeInserir }])
+            .select();
 
         if (error) throw error;
         

@@ -11,7 +11,7 @@ router.get('/', async (req, res, next) => {
         const {categoriaId} = req.query;
         let consulta = supabase.from('produtos').select('*');
         if (categoriaId){
-            consulta = consulta.eq('categoriaId', categoriaId);
+            consulta = consulta.eq('categoria_id', categoriaId);
         }
 
         const {data, error} = 
